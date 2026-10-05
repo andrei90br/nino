@@ -46,6 +46,36 @@ Ogni foto è un segnaposto nel template. Se in `src/assets/img/` esiste un file 
 
 Pesi consigliati: hero e pannelli sotto i 400 KB, card sotto i 150 KB (WebP o AVIF).
 
+### Stato attuale: foto prese dal sito nivishotel.it
+
+Tutti i 19 slot usano foto del sito attuale dell'hotel, ridimensionate (max 2200 px per l'hero, 1920 per i pannelli, 1000 per le card)
+e ricompresse in JPEG qualità 82. File originali (in `wp-content/uploads/` del sito attuale):
+
+| Slot | Originale |
+|---|---|
+| `hero` | `2024/12/Nivis_hotel_1-scaled.jpg` |
+| `story1` | `2026/08/Adults-only_V1.jpg` |
+| `story2` | `2024/11/Nivis_Hotel_Esterno-21.jpg` |
+| `story3` | `2024/11/nivis_piscina-6-2.jpg` |
+| `story4` | `2026/03/nivis_ristorante-15.jpg` |
+| `story5` | `2024/11/skier-is-going-down-mountain-with-mountain-him.jpg` (stock) |
+| `story6` | `2024/11/passo-mendola-tornanti.jpg` (ritagliata: tolto il 15% inferiore, c'era il credito del fotografo) |
+| `stay` | `2024/11/nivis_camere_suite-23.jpg` |
+| `room1` … `room4` | `nivis_Matrimoniale-Superior_1`, `nivis_Suite-prestige_1`, `nivis_Suite-Nivis_1`, `nivis_Suite-traditional_1` (tutte `2024/11/`) |
+| `spot1` | `2024/11/nivis_camere_suite-59.jpg` |
+| `spot2` | `2024/11/dog-lifestyle-care-with-owner.jpg` (stock) |
+| `spot3` | `2024/11/mercatini-natale-bolzano.jpg` (terzi) |
+| `spot4` | `2024/11/Lago-di-Tovel-Trentino.jpg` (terzi) |
+| `spot5` | `2024/11/San-romedio.jpg` (terzi) |
+| `spot6` | `2024/11/passo-mendola.jpg` (terzi) |
+| `fin` | `2024/12/Nivis_Hotel_Esterno-8.jpg` |
+
+Da sapere prima del go-live:
+- Le foto del sito attuale sono quasi tutte **autunnali**: l'hotel non ha scatti con la neve (l'unica foto invernale è la stock dello sciatore).
+  Il titolo dell'hero parla di inverno, quindi conviene un servizio invernale. Basta salvare i nuovi file con gli stessi nomi.
+- Le foto marcate "stock" o "terzi" sono verosimilmente su licenza: verificare con l'hotel che si possano riusare sul sito nuovo, oppure sostituirle.
+- I testi alternativi (`*_alt` nei JSON) descrivono queste foto: se le sostituisci, aggiornali.
+
 ## Cosa fa la pagina
 
 - CTA primaria: prenotazione diretta sul motore SimpleBooking dell'hotel (`hotel/10212`), lingua passata in automatico (`lang=IT|EN|DE`).
@@ -58,7 +88,7 @@ Pesi consigliati: hero e pannelli sotto i 400 KB, card sotto i 150 KB (WebP o AV
 
 ## Prima del go-live
 
-- **Foto e video reali** (vedi tabella): oggi sono tutti placeholder.
+- **Foto**: oggi sono quelle del sito attuale (vedi "Stato attuale"); servono scatti invernali e la verifica delle licenze. Nessun video.
 - **Date precompilate nel motore di prenotazione**: SimpleBooking è una SPA e non espone le date nell'URL.
   Oggi i pulsanti aprono il motore con la lingua; per avere una booking bar con date e ospiti serve il formato del deep link (chiederlo a SimpleBooking).
 - **Font**: Cormorant Garamond e Jost sono caricati da Google Fonts. Per il pubblico tedesco conviene servirli dal proprio dominio (GDPR): scaricare i `.woff2` e sostituire il `<link>` nel template con `@font-face`.
