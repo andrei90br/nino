@@ -1,0 +1,131 @@
+/* Nivis Hotel & Spa — componenti specifici, caricati dopo 00-base.css (stessi token, stessa griglia a 4 colonne) */
+
+/* Eyebrow in Jost: il display Cormorant a 13-16px con spaziatura larga perde leggibilità */
+.eyebrow{font:500 13px/20px var(--sans);letter-spacing:.3em}
+.scard .eyebrow{font-size:12px;letter-spacing:.24em}
+
+/* Logo: marchio a tre cime + wordmark. Il colore segue il tema dell'header (bianco su foto, inchiostro su fondo chiaro) */
+.logo{display:inline-flex;flex-direction:column;align-items:center;gap:3px;line-height:1;color:currentColor}
+.logo__m{width:36px;height:auto;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linejoin:round;margin-bottom:3px}
+.logo b{font:500 24px/1 var(--disp);letter-spacing:.42em;margin-right:-.42em}
+.logo i{font:400 8.5px/1 var(--sans);font-style:normal;letter-spacing:.36em;margin-right:-.36em}
+.logo--dk{color:var(--ink)}
+.ft__logo{display:inline-block}
+
+/* Immagini: foto reale (<img class="m">) oppure placeholder illustrato (<div class="m ph ph--variante">).
+   :where() = specificità zero, così position:absolute di .hero__bg / .story__bg / .fin__bg / .stay__hero>.m resta valido */
+.m{display:block;max-width:100%;object-fit:cover}
+:where(.ph){position:relative}
+.ph{overflow:hidden;background:#1c2740}
+.ph__s{position:absolute;left:0;right:0;bottom:0;width:100%;height:64%}
+.ph__s .r1{fill:var(--r1)}.ph__s .r2{fill:var(--r2)}.ph__s .r3{fill:var(--r3)}
+.ph__t{position:absolute;left:14px;bottom:10px;font:400 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+.ph--dusk{--r1:#4a4663;--r2:#1f2a45;--r3:#0c1520;background:linear-gradient(180deg,#0f1a2b 0%,#26324d 30%,#6c5878 56%,#d98f86 79%,#f0c3a2 100%)}
+.ph--dusk::after{content:"";position:absolute;left:0;right:0;bottom:22%;height:42%;background:radial-gradient(ellipse 48% 100% at 50% 100%,rgba(255,206,168,.38),rgba(255,206,168,0) 72%);pointer-events:none}
+.ph--night{--r1:#0f3441;--r2:#0a2530;--r3:#061620;background:radial-gradient(ellipse 62% 48% at 50% 72%,rgba(61,165,176,.7) 0%,rgba(61,165,176,0) 72%),linear-gradient(180deg,#07141d,#0b2a36)}
+.ph--forest{--r1:#2b4a3d;--r2:#1b3328;--r3:#0d1a14;background:linear-gradient(180deg,#1a2e2b 0%,#35564a 48%,#7b9a83 100%)}
+.ph--snow{--r1:#b4c7d5;--r2:#97b0c3;--r3:#7f9bb1;background:linear-gradient(180deg,#cddbe6 0%,#e7eff4 56%,#f7fafb 100%)}
+.ph--snow .ph__t{color:rgba(11,20,28,.62)}
+.ph--wood,.ph--table{background:radial-gradient(ellipse 46% 52% at 50% 36%,rgba(255,226,186,.5),rgba(255,226,186,0) 72%),repeating-linear-gradient(90deg,rgba(0,0,0,.08) 0 2px,transparent 2px 46px),linear-gradient(180deg,#5a3d2b 0%,#8d6443 56%,#c9a275 100%)}
+.ph--table{background:radial-gradient(ellipse 48% 42% at 50% 60%,rgba(244,196,128,.62),rgba(244,196,128,0) 72%),linear-gradient(180deg,#1b110c,#3a2418 60%,#6b4630)}
+.ph--wood .ph__s,.ph--table .ph__s{display:none}
+
+/* Hero: neve su canvas (main.js) sopra la foto o la scena, sotto il velo */
+.hero__snow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.hero h1{font-size:clamp(38px,5vw,66px)}
+.hero__cta .btn-f,.fin__cta .btn-f,.direct .btn-f,.stay__btn .btn-f,.sticky .btn-f{text-align:center}
+.stay__btn .btn-f{padding:16px 36px}
+
+/* Camere: etichetta (m², ospiti) e prezzo "da" nelle card */
+.grid4 .meta{display:block;margin-bottom:8px;font:500 12px/16px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--acc-t)}
+.grid4 .act{justify-content:space-between}
+.price{font:500 15px/20px var(--sans);letter-spacing:.3px;color:var(--ink)}
+
+/* Tabella tipologie */
+.tipo{padding:0 var(--mc) var(--sec);background:#fff}
+.rooms{width:100%;border-collapse:collapse;font-size:15px}
+.rooms caption{padding-bottom:16px;text-align:left;font:500 12px/16px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#757575}
+.rooms th,.rooms td{padding:18px 0;border-top:1px solid #e3e3e3;text-align:left;font-weight:400}
+.rooms thead th{border-top:0;border-bottom:1px solid var(--ink);font:500 12px/16px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--ink)}
+.rooms tbody th{width:40%;font:500 20px/26px var(--disp);letter-spacing:.02em;color:var(--ink)}
+.rooms th:last-child,.rooms td:last-child{text-align:right;color:var(--ink)}
+.rooms td:last-child{font-weight:500}
+.rooms tbody tr:last-child th,.rooms tbody tr:last-child td{border-bottom:1px solid #e3e3e3}
+.rooms tbody tr:hover th,.rooms tbody tr:hover td{background:#faf6f3}
+.tipo__note{margin-top:16px;font-size:13px;color:#757575}
+
+/* Value stack: cosa include la prenotazione diretta. Titolo e CTA nella colonna 1, otto vantaggi nelle colonne 2-4 su due colonne */
+.direct{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:var(--g);padding:var(--sec) var(--mc);background:linear-gradient(180deg,#0b141c,#10202b);color:#fff;--ring:var(--acc)}
+.direct__l{grid-column:1}
+.direct .eyebrow{margin-bottom:16px}
+.direct h2{margin:0 0 20px;font:500 clamp(32px,3vw,40px)/1.2 var(--disp);text-transform:uppercase;letter-spacing:.02em}
+.direct__l>p{margin-bottom:28px;font-weight:300;color:rgba(255,255,255,.88)}
+.direct .direct__m{margin:16px 0 0;font-size:13px;color:rgba(255,255,255,.72)}
+.direct__g{grid-column:2 / -1;list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 var(--g);align-content:start}
+.direct__g li{position:relative;padding:22px 0 22px 36px;border-top:1px solid rgba(255,255,255,.18)}
+.direct__g li::before{content:"";position:absolute;left:2px;top:32px;width:12px;height:6px;border-left:1px solid var(--acc);border-bottom:1px solid var(--acc);transform:rotate(-45deg)}
+.direct__g b{display:block;margin-bottom:6px;font:500 22px/28px var(--disp);letter-spacing:.02em}
+.direct__g span{font-weight:300;color:rgba(255,255,255,.84)}
+
+/* In evidenza: il pulsante "Richiedi" ha lo stesso aspetto dei link "Prenota / Leggi" */
+.scard .lnk-b{margin-top:auto;align-self:flex-start}
+
+/* Dove siamo: testo nelle colonne 1-2, mappa nelle colonne 3-4 */
+.where{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:var(--g);padding:var(--sec) var(--mc);background:#fff;border-top:1px solid #ececec}
+.where__l{grid-column:1 / 3;padding-right:var(--g)}
+.where__map{grid-column:3 / -1;min-height:440px}
+.where h2{margin:16px 0 20px;font:500 clamp(32px,3vw,40px)/1.2 var(--disp);text-transform:uppercase;letter-spacing:.02em;color:#000}
+.where__l>p{font-weight:300;max-width:52ch}
+.where__f{list-style:none;margin:28px 0;padding:0;display:grid;gap:10px}
+.where__f li{position:relative;padding-left:24px;color:var(--ink)}
+.where__f li::before{content:"";position:absolute;left:1px;top:9px;width:10px;height:5px;border-left:1px solid var(--acc-d);border-bottom:1px solid var(--acc-d);transform:rotate(-45deg)}
+.where address{margin-bottom:28px;font-style:normal;color:var(--ink)}
+.map{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;overflow:hidden;background:#e9eef0;text-align:center}
+.map__bg{position:absolute;inset:0;width:100%;height:100%}
+.map__bg path{fill:none;stroke:#b7c7cf;stroke-width:2}
+.map__bg circle{fill:var(--acc-d)}
+.map:not(.is-on){padding-top:128px} /* il pin disegnato nello sfondo sta sopra il pulsante, non sotto */
+.map__btn,.map__note{position:relative}
+.map__note{max-width:36ch;font-size:12px;line-height:18px;color:#4f5f68}
+.map.is-on{display:block;padding:0}
+.map__f{position:absolute;inset:0;width:100%;height:100%;border:0}
+
+/* Chiusura: alternativa "proposta su misura" sotto il pulsante principale */
+.fin__alt{margin:0 0 20px;font-size:14px;color:rgba(255,255,255,.9)}
+.lnk-b--w{color:var(--acc)}
+.lnk-b--w:hover{color:#fff}
+
+/* Selettore lingua nel footer (fondo chiaro) */
+.ft__bar .lang{border-color:var(--line)}
+.ft__bar .lang a[aria-current]{background:var(--ink);color:#fff}
+
+@media (prefers-reduced-motion:reduce){
+  .hero__snow{display:none}
+}
+
+@media (max-width:1100px){
+  .direct,.where{grid-template-columns:minmax(0,1fr);row-gap:calc(var(--u)*5)}
+  .direct__l,.direct__g,.where__l,.where__map{grid-column:auto}
+  .where__l{padding-right:0}
+  .where__map{min-height:360px}
+  .direct h2,.where h2{font-size:var(--fs-h2)}
+}
+@media (max-width:700px){
+  .logo b{font-size:20px}
+  .logo__m{width:30px}
+  .logo i{font-size:7.5px}
+  .hero h1{font-size:clamp(30px,8.8vw,38px)}
+  .direct__g{grid-template-columns:minmax(0,1fr)}
+  .direct h2,.where h2{line-height:1.15}
+  .rooms th,.rooms td{padding:14px 0}
+  .rooms tbody th{width:auto;font-size:18px;line-height:22px}
+  .rooms td{font-size:14px}
+  .where__map{min-height:320px}
+  .tipo{padding-bottom:calc(var(--u)*6)}
+}
+/* Telefoni stretti (320-400px): la tabella a 4 colonne resta dentro i margini senza scorrimento orizzontale */
+@media (max-width:400px){
+  .rooms thead th{font-size:10px;letter-spacing:.06em}
+  .rooms tbody th{font-size:16px;line-height:20px}
+  .rooms td{font-size:13px}
+}

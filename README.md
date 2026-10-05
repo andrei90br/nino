@@ -1,0 +1,79 @@
+# Nivis Hotel & Spa — sito nuovo
+
+Landing page statica in tre lingue (italiano, inglese, tedesco) per il Nivis Hotel & Spa, Folgarida (Val di Sole).
+Fatti, prezzi e orari sono quelli del sito attuale (nivishotel.it); il ritmo delle sezioni segue il reference
+atlantis.com/dubai/atlantis-the-royal (solo studio di struttura: non è incluso alcun asset di Atlantis).
+Stessa architettura del progetto `Sito Hotel` (Belfiore): template unico + JSON per lingua + build PowerShell.
+
+## Struttura
+
+```
+src/template.html        template unico con segnaposto {{chiave}} e [[IMG ...]]
+src/lang/*.json          testi in it / en / de (stesse chiavi)
+src/assets/css/          00-base.css (griglia, header, menu, carosello, modulo) + 10-nivis.css (componenti Nivis)
+src/assets/main.js       header, menu, pannelli a scorrimento, neve, carosello, mappa, modulo
+src/assets/img/          qui vanno le foto (vedi sotto)
+build.ps1                genera site/ (IT in radice, /en/, /de/) + robots.txt + sitemap.xml
+serve.ps1                anteprima locale su http://localhost:5175/
+```
+
+## Comandi (Windows PowerShell)
+
+```powershell
+# genera il sito
+powershell -ExecutionPolicy Bypass -File build.ps1
+
+# anteprima locale
+powershell -ExecutionPolicy Bypass -File serve.ps1 -Port 5175
+```
+
+Parametri di `build.ps1`: `-Site` (URL finale per canonical, hreflang, sitemap), `-Booking` (motore di prenotazione), `-NoIndex` (anteprime).
+
+## Foto e video
+
+Ogni foto è un segnaposto nel template. Se in `src/assets/img/` esiste un file con il nome giusto
+(`.jpg`, `.jpeg`, `.webp`, `.avif` o `.png`) la build usa la foto, altrimenti mostra un placeholder illustrato con l'etichetta
+`FOTO · nome`. Per sostituire un placeholder: salva la foto con quel nome e rilancia la build.
+
+| Nome | Dove | Formato consigliato |
+|---|---|---|
+| `hero` | Hero a tutto schermo (e anteprima social Open Graph) | 1920×1080 o più, orizzontale, inverno/tramonto |
+| `story1` … `story6` | Pannelli a scorrimento: Adults Only, natura, spa, cucina, piste, esperienze | 1920×1080, soggetto al centro (il testo è centrato) |
+| `stay` | Banner "Camere & Suite" | 1920×1000 |
+| `room1` … `room4` | Card camere: Classic/Superior, Junior Suite/Prestige, Nivis/Alpin, Traditional | quadrata, 1200×1200 |
+| `spot1` … `spot6` | Carosello: Early Booking, pet friendly, Natale, Tovel, San Romedio, Mendola | quadrata, 1000×1000 |
+| `fin` | Sfondo della chiusura | 1920×1080 |
+
+Pesi consigliati: hero e pannelli sotto i 400 KB, card sotto i 150 KB (WebP o AVIF).
+
+## Cosa fa la pagina
+
+- CTA primaria: prenotazione diretta sul motore SimpleBooking dell'hotel (`hotel/10212`), lingua passata in automatico (`lang=IT|EN|DE`).
+- CTA secondaria: modulo "proposta su misura" (apre il programma di posta con la richiesta compilata).
+- Eventi su `dataLayer` (GTM/GA4 compatibile, nessuno script esterno): `booking_click`, `cta_click`, `generate_lead`.
+- Dati strutturati `Hotel` e `FAQPage`, hreflang IT/EN/DE, sitemap con alternate.
+- Nessun cookie, nessun tracker. La mappa OpenStreetMap si carica solo dopo il clic (nessuna connessione a terzi prima).
+- Accessibilità: contrasti WCAG AA misurati (vedi `00-base.css`), focus visibile, menu e pannello con trap del focus,
+  gerarchia titoli h1 → h2 → h3, `prefers-reduced-motion` (niente neve né animazioni).
+
+## Prima del go-live
+
+- **Foto e video reali** (vedi tabella): oggi sono tutti placeholder.
+- **Date precompilate nel motore di prenotazione**: SimpleBooking è una SPA e non espone le date nell'URL.
+  Oggi i pulsanti aprono il motore con la lingua; per avere una booking bar con date e ospiti serve il formato del deep link (chiederlo a SimpleBooking).
+- **Font**: Cormorant Garamond e Jost sono caricati da Google Fonts. Per il pubblico tedesco conviene servirli dal proprio dominio (GDPR): scaricare i `.woff2` e sostituire il `<link>` nel template con `@font-face`.
+- **Modulo**: oggi apre il programma di posta con `mailto:`. Per un invio vero serve un endpoint (es. Formspree).
+- **Dominio**: cambiare `-Site` in `build.ps1` e togliere `-NoIndex` dalle anteprime.
+- **Recensioni**: lo slot è predisposto nel template (commento "Slot recensioni"). Inserire solo recensioni reali con nome, provenienza, data e fonte.
+- **Privacy e cookie policy**: i link puntano alle pagine del sito attuale (nivishotel.it).
+- **Testi da far confermare all'hotel**: vedi elenco qui sotto.
+
+### Affermazioni da confermare con l'hotel
+
+1. Cosa è davvero incluso in ogni soggiorno diretto: colazione a buffet, accesso alla spa/piscina, navetta, Wi-Fi (sezione "Cosa include" e CTA finale).
+2. Età minima: il sito attuale dice "dai 13-14 anni"; la pagina riporta la stessa formula (FAQ 2).
+3. Capienza della Suite Nivis (nella tabella è "–": il sito attuale non la indica).
+4. Prezzi "a partire da" (card e tabella): presi dal sito attuale, possono essere cambiati.
+5. Early Booking −10% (soggiorni da 3 notti): offerta del sito attuale, verificarne la validità e le condizioni.
+6. "Risponde la famiglia che gestisce l'hotel" (gestione familiare dal sito attuale).
+7. CIN e indirizzo in footer (presi dal sito attuale).

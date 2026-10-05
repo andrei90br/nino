@@ -1,0 +1,417 @@
+/* Nivis Hotel & Spa — layout e sistema visivo ricalcati su atlantis.com/dubai/atlantis-the-royal
+   Misure ricavate dalla pagina: margini 72px · header 96px · hero 100vh · H1 64/72 · H3 40/48 · H4 24/28
+   eyebrow 16/20 spaziatura 4px · testo 14/24 spaziatura .5px · card 352px · griglia 4 colonne fluide (~292px) · gutter 40px
+   Font display: Cormorant Garamond · testo: Jost (sostituto libero di Averta) */
+:root{
+  --acc:#e6bba5;
+  --acc-d:#b8765c;
+  --ink:#212121;
+  --text:#424242;
+
+  /* ===== ACCESSIBILITÀ VISIVA — contrasti misurati sulla palette Nivis (soglie WCAG 2.2 AA) =====
+     --acc    #e6bba5  "enrosadira": testo, bordi e anello sui fondi SCURI → 10,6:1 su #0b141c
+     --acc-d  #b8765c  solo elementi NON testuali su bianco (bordi, indicatori) → 3,63:1 su #fff, 3,48:1 su #fafafa (soglia 3:1)
+     --acc-t  #8c4d3a  TESTO su fondo chiaro → 6,49:1 su #fff, 6,21:1 su #fafafa (soglia 4,5:1)
+     --line   #949494  linee dei componenti UI su bianco (campi del modulo, traccia del carosello) → 3,03:1 (soglia 3:1)
+     --err    #b3402c  errore → 5,70:1 su bianco
+     --ring   anello di focus 2px: --acc-t sui fondi chiari, --acc su header scuro, menu, hero, pannelli, camere su foto, chiusura e barra mobile */
+  --acc-t:#8c4d3a;
+  --line:#949494;
+  --err:#b3402c;
+  --ring:var(--acc-t);
+
+  /* ===== GRID SYSTEM — unico punto in cui vivono le misure di griglia; i breakpoint (1100 / 700) le ridefiniscono =====
+     --u     unità di spaziatura 8px: padding di sezione, gutter e gap verticali sono multipli di --u
+     --m     margine laterale "a filo" (header, menu, immagine camere, bordo destro del carosello): 72px · 40px ≤1100 · 24px ≤700
+     --max   larghezza massima del contenuto: 1296px (= 1440 − 2×72, come Atlantis). Oltre 1440px il contenuto resta centrato
+     --mc    margine laterale del CONTENUTO = max(--m, (100vw − --max)/2). Fino a 1440px coincide con --m
+     --g     gutter tra colonne: 40px · 24px ≤700
+     Griglia: 4 colonne fluide minmax(0,1fr) dentro --mc; colonna = (larghezza − 2·--mc − 3·--g)/4 → 291,5px a 1430px, 294px al massimo.
+             Proof, carosello (testo = col. 1, prima card = col. 2), camere, FAQ (titolo = col. 1, domande = col. 2-4) e
+             colonne del footer usano la stessa griglia, quindi le colonne 1-4 cadono sulle stesse x.
+     --card  larghezza della card del carosello: 352px · 280px ≤700 (parte dalla colonna 2)
+     --sec   padding verticale di sezione: 72px · 56px ≤1100 · 48px ≤700
+     --sec-s padding verticale delle fasce sottili (proof, camere): 56px · 48px ≤1100
+     --row   distanza verticale tra righe di card impilate (camere, tablet/mobile)
+     --hh    altezza header: 96px · 72px ≤700 */
+  --u:8px;
+  --m:72px;
+  --max:1296px;
+  --mc:max(var(--m),calc((100vw - var(--max))/2));
+  --g:calc(var(--u)*5);
+  --card:352px;
+  --sec:calc(var(--u)*9);
+  --sec-s:calc(var(--u)*7);
+  --row:calc(var(--u)*7);
+  --hh:96px;
+
+  /* ===== GERARCHIA — scala tipografica e velo sotto i testi sulle foto =====
+     --fs-h1   titolo hero: 36px → 4,6vw → tetto 60px (mobile ≤700px: 28→32px, vedi blocco mobile)
+     --fs-h2   titoli di sezione: 28px → 3,6vw → tetto 40px (usato sotto i 1100px; sopra restano 40px, tranne i titoli di colonna 1); mobile ≤700px: 24→28px
+     --fs-h3   titoli delle card: 22px → 2,2vw → tetto 24px (usato sotto i 1100px); mobile ≤700px: h2 ÷ 1,27
+     Rapporti tra livelli adiacenti: h1/h2 ≥ 1,27 da 701px in su (prima < 1 tra 700 e 900px), 1,14–1,17 su mobile (h1 vincolato a 4 righe) · h2/h3 ≥ 1,27 · numeri "prove" = h2/1,25 (32px a 1440)
+     --scrim   velo radiale sotto i testi centrati sulle foto (hero, pannelli, camere): scuro al centro, foto piena ai bordi.
+               Misurato con foto reali: contrasto ≥ 4,5:1 sui pixel più chiari sotto ogni riga (vedi QA-report.md §2) */
+  --fs-h1:clamp(36px,4.6vw,60px);
+  --fs-h2:clamp(28px,3.6vw,40px);
+  --fs-h3:clamp(22px,2.2vw,24px);
+  --fs-proof:calc(var(--fs-h2) / 1.25); /* numeri della fascia prove: sempre h2 ÷ 1,25 → 32px a 1440, 22px su mobile */
+  --scrim:rgba(0,0,0,.5) 0%,rgba(0,0,0,.3) 55%,rgba(0,0,0,0) 100%;
+
+  --disp:"Cormorant Garamond","Times New Roman",serif;
+  --sans:"Jost",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--hh) + var(--u))} /* WCAG 2.4.11: il focus (Tab / Maiusc+Tab) e i link a #ancora non finiscono sotto l'header fisso (--hh) */
+body{margin:0;background:#fff;color:var(--text);font:400 14px/24px var(--sans);letter-spacing:.5px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+p{margin:0}
+h1,h2,h3,h3{margin:0;font-weight:400;text-wrap:balance} /* balance: niente riga finale da una parola sola (es. "PISTE") */
+button{font:inherit;letter-spacing:inherit;color:inherit}
+[hidden]{display:none!important}
+.skip{position:absolute;left:-999px;top:8px;background:#fff;color:#000;padding:.6rem 1rem;z-index:300}
+.skip:focus{left:12px}
+/* Testo solo per lettori di schermo (es. "si apre in una nuova scheda", contesto dei link "Scopri"): non altera l'aspetto */
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+/* Il salto "Vai al contenuto" sposta il focus su <main> (tabindex=-1): niente cornice attorno a tutta la pagina */
+#main:focus{outline:0}
+/* Focus visibile: anello 2px (era 1px sabbia, 1,88:1 sui fondi chiari) con colore per tema: --ring = sabbia scuro sui fondi chiari (4,73:1 su bianco),
+   sabbia chiaro (--acc) su header scuro, menu, hero, pannelli, camere su foto, chiusura e barra mobile. Su Windows a contrasto forzato l'outline resta (colore di sistema). */
+:focus-visible{outline:2px solid var(--ring);outline-offset:4px}
+.hd.is-dark,.menu,.hero,.story__stick,.stay__hero,.fin,.sticky{--ring:var(--acc)}
+
+/* Elementi tipografici ricorrenti */
+.eyebrow{display:block;font:500 16px/20px var(--disp);letter-spacing:4px;text-transform:uppercase;color:#fff}
+.eyebrow--dk{color:var(--ink)}
+.lnk,.lnk-b{display:inline-block;color:var(--acc-t);border:0;border-bottom:1px solid currentColor;padding:0 0 2px;background:none;cursor:pointer;font:400 14px/20px var(--sans);letter-spacing:.5px;transition:color .3s,border-color .3s}
+.lnk:hover,.lnk-b:hover{color:var(--ink)}
+.lnk--w{color:#fff}
+.lnk--w:hover{color:var(--acc)}
+
+/* Pulsanti a contorno (Book / Explore) */
+.btn-o{display:inline-flex;align-items:center;justify-content:center;padding:16px 56px;border:1px solid var(--acc);background:rgba(255,255,255,.05);color:var(--acc);font:400 14px/14px var(--sans);letter-spacing:.5px;cursor:pointer;transition:background .35s,color .35s,border-color .35s}
+.btn-o:hover{background:var(--acc);color:var(--ink)}
+.btn-o--sm{padding:12px 32px;border-color:#fff6f0;color:#fff6f0;background:rgba(0,0,0,.05)}
+.btn-o--sm:hover{background:#fff6f0;border-color:#fff6f0;color:var(--ink)}
+.btn-o--dk{border-color:var(--acc-d);color:var(--acc-t);background:transparent}
+.btn-o--dk:hover{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn-s{display:block;width:100%;margin-top:8px;padding:18px 24px;border:0;background:var(--ink);color:#fff;font:400 14px/14px var(--sans);letter-spacing:.5px;cursor:pointer;transition:background .3s}
+.btn-s:hover{background:var(--acc-t)}
+
+/* Header fisso: hamburger · logo centrale · pulsante */
+.hd{position:fixed;inset:0 0 auto 0;z-index:60;height:var(--hh);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 var(--m);transition:background .45s,border-color .45s,color .45s}
+.hd.is-dark{color:#fff;background:rgba(11,20,28,.32);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.18)}
+.hd.is-light{color:var(--ink);background:rgba(255,255,255,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(0,0,0,.08)}
+.hd__menu,.menu__x,.req__x{position:relative;width:44px;height:44px;padding:0;border:0;background:none;cursor:pointer;justify-self:start}
+.hd__menu span{position:absolute;left:10px;width:24px;height:1px;background:currentColor;transition:transform .3s,width .3s}
+.hd__menu span:first-child{top:17px}.hd__menu span:last-child{top:26px}
+.hd__menu:hover span:last-child{width:16px}
+.hd__logo{justify-self:center}
+.hd__logo img{height:64px;width:auto;transition:filter .45s}
+.hd.is-dark .hd__logo img{filter:brightness(0) invert(1)}
+.hd__book{justify-self:end}
+.hd.is-light .hd__book{color:var(--acc-t);border-color:var(--acc-d);background:rgba(0,0,0,.02)}
+.hd.is-light .hd__book:hover{background:var(--ink);border-color:var(--ink);color:#fff}
+
+/* Menu a tutto schermo */
+.menu{position:fixed;inset:0;z-index:100;background:rgba(8,16,22,.97);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity .5s,visibility .5s}
+.menu.is-open{opacity:1;visibility:visible}
+.menu__x{position:absolute;top:calc((var(--hh) - 44px)/2);left:var(--m)}
+.menu__body{display:contents} /* nessun box: voci e piede si comportano come figli diretti di .menu (vedi @media max-height:600px in fondo) */
+.menu__x span,.req__x span{position:absolute;left:10px;top:21px;width:24px;height:1px;background:currentColor}
+.menu__x span:first-child,.req__x span:first-child{transform:rotate(45deg)}
+.menu__x span:last-child,.req__x span:last-child{transform:rotate(-45deg)}
+.menu__nav{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:0 24px}
+.menu__nav a{font:500 clamp(22px,3vw,34px)/1.2 var(--disp);letter-spacing:.08em;text-transform:uppercase;color:#fff;opacity:0;transform:translateY(14px);transition:opacity .6s,transform .6s,color .3s}
+.menu.is-open .menu__nav a{opacity:1;transform:none}
+.menu.is-open .menu__nav a:nth-child(2){transition-delay:.05s}.menu.is-open .menu__nav a:nth-child(3){transition-delay:.1s}.menu.is-open .menu__nav a:nth-child(4){transition-delay:.15s}.menu.is-open .menu__nav a:nth-child(5){transition-delay:.2s}.menu.is-open .menu__nav a:nth-child(6){transition-delay:.25s}.menu.is-open .menu__nav a:nth-child(7){transition-delay:.3s}.menu.is-open .menu__nav a:nth-child(8){transition-delay:.35s}
+.menu__nav a:hover{color:var(--acc)}
+.menu__foot{position:absolute;bottom:40px;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:32px;flex-wrap:wrap;font-size:14px;color:rgba(255,255,255,.8);padding:0 24px}
+.menu__foot a:hover{color:var(--acc)}
+.lang{display:flex;gap:0;border:1px solid rgba(255,255,255,.35)}
+.lang a{padding:6px 14px;font-size:12px;letter-spacing:.14em}
+.lang a[aria-current]{background:#fff;color:var(--ink)}
+
+/* Hero a tutta altezza */
+.hero{position:relative;height:100vh;height:100svh;min-height:560px;overflow:hidden;background:#0b141c;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center}
+.hero__bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 55%;animation:kb 28s ease-out both}
+@keyframes kb{from{transform:scale(1.1)}to{transform:scale(1)}}
+.hero__shade{position:absolute;inset:0;background:radial-gradient(ellipse 65% 55% at 50% 50%,var(--scrim)),linear-gradient(180deg,rgba(0,0,0,.45) 0%,rgba(0,0,0,.32) 35%,rgba(0,0,0,.4) 65%,rgba(0,0,0,.6) 100%)}
+.hero__c{position:relative;width:min(1065px,100% - 2*var(--m))}
+.hero__c .eyebrow{margin-bottom:16px}
+.hero h1{font:500 var(--fs-h1)/1.14 var(--disp);text-transform:uppercase;letter-spacing:.02em;margin-bottom:20px}
+.hero__sub{font-weight:300;color:#fff;font-size:16px;line-height:26px;max-width:720px;margin:0 auto 32px}
+.hero__cta{display:flex;align-items:center;justify-content:center;gap:32px;flex-wrap:wrap;margin-bottom:20px}
+.hero__micro{font-size:13px;font-weight:400;color:rgba(255,255,255,.8)}
+.hero__cue{position:absolute;left:50%;bottom:0;width:1px;height:88px;background:rgba(255,255,255,.35);overflow:hidden}
+.hero__cue::after{content:"";position:absolute;left:0;top:-100%;width:100%;height:100%;background:#fff;animation:cue 2.4s ease-in-out infinite}
+@keyframes cue{0%{top:-100%}60%,100%{top:100%}}
+
+/* Pannelli a scorrimento */
+.story{position:relative;height:calc(var(--n)*100vh);background:#000}
+.story__stick{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;color:#fff}
+.story__bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.07);transition:opacity 1.3s ease,transform 7s ease-out}
+.story__bg.is-on{opacity:1;transform:scale(1)}
+.story__shade{position:absolute;inset:0;background:radial-gradient(ellipse 55% 42% at 50% 50%,var(--scrim)),linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.25) 40%,rgba(0,0,0,.55))}
+.story__txts{position:absolute;inset:0}
+/* I pannelli non attivi restano nell'albero di accessibilità (prima: visibility:hidden → i lettori di schermo vedevano solo il primo pannello);
+   sono trasparenti, non cliccabili e i loro link sono fuori dall'ordine di Tab (tabindex=-1 gestito in main.js) */
+.story__t{position:absolute;left:50%;top:50%;width:min(844px,100% - 2*var(--m));text-align:center;transform:translate(-50%,-42%);opacity:0;pointer-events:none;transition:opacity .8s ease,transform .8s ease}
+.story__t.is-on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%)}
+.story__t .eyebrow{margin-bottom:16px}
+.story__t h2{font:500 40px/48px var(--disp);text-transform:uppercase;letter-spacing:.02em;margin-bottom:16px}
+.story__t p{font-weight:400;max-width:640px;margin:0 auto 32px}
+.story__dots{position:absolute;right:28px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:12px;margin:0;padding:0;list-style:none}
+.story__dots li{width:1px;height:22px;background:rgba(255,255,255,.4);transition:height .4s,background .4s}
+.story__dots li.is-on{height:44px;background:#fff}
+
+/* In evidenza — carosello: testo nella colonna 1, la prima card parte dalla colonna 2 e il track sfora a filo fino al bordo destro */
+.spot{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:var(--g);padding:var(--sec) var(--mc);background:#fff;overflow:hidden}
+.spot__l{grid-column:1}
+/* h2 di colonna 1 (spot, faq): la colonna è ~205px a 1101px, quindi tra 1101 e ~1330px il corpo scende (33→40px) per non sforare
+   con le parole lunghe (es. "Vorschlag"); da ~1330px (e a 1440px) è 40px come Atlantis. Sotto i 1100px torna 40px (blocco a piena larghezza). */
+.spot__l h2{font:500 clamp(32px,3vw,40px)/48px var(--disp);text-transform:uppercase;letter-spacing:.02em;color:#000;margin:16px 0 20px}
+.spot__l p{font-weight:300;color:var(--text)}
+.spot__ctl{display:flex;align-items:center;gap:12px;margin-top:56px}
+.bar{position:relative;flex:1;height:1px;background:var(--line);margin-right:8px} /* traccia #d9d9d9 → #949494: 1,41 → 3,03:1 (WCAG 1.4.11) */
+.bar i{position:absolute;left:0;top:-0.5px;height:2px;width:30%;background:var(--acc-t);transition:width .3s,left .3s}
+.arr{width:36px;height:36px;padding:0;border:1px solid #d9d9d9;background:none;border-radius:50%;cursor:pointer;display:grid;place-items:center;transition:background .3s,border-color .3s}
+.arr svg{width:16px;height:16px;fill:none;stroke:var(--ink);stroke-width:1.2}
+.arr:hover{background:var(--ink);border-color:var(--ink)}.arr:hover svg{stroke:#fff}
+/* Inizio / fine del carosello: la freccia si attenua (aria-disabled, non disabled: il focus da tastiera non si perde). Atlantis nasconde la freccia (disabled, opacity 0) */
+.arr[aria-disabled="true"]{cursor:default;border-color:#ececec}
+.arr[aria-disabled="true"] svg{opacity:.35} /* solo il glifo: l'anello di focus (outline) resta a piena opacità */
+.arr[aria-disabled="true"]:hover{background:none;border-color:#ececec}.arr[aria-disabled="true"]:hover svg{stroke:var(--ink)}
+.spot__track{grid-column:2 / -1;min-width:0;display:flex;gap:var(--g);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin-right:calc(-1*var(--mc));padding-right:var(--mc);
+  /* 6px di respiro (compensati da margini negativi: nessuno spostamento) perché l'anello di focus 2px + offset 4px dei link e del track non venga tagliato da overflow */
+  padding-block:6px;margin-block:-6px;padding-left:6px;margin-left:-6px;scroll-padding-left:6px}
+.spot__track::-webkit-scrollbar{display:none}
+.scard{flex:0 0 var(--card);scroll-snap-align:start;display:flex;flex-direction:column}
+.scard .lnk{margin-top:auto;align-self:flex-start} /* i link "Scopri" restano sulla stessa linea anche con titoli di 1 o 2 righe */
+.scard .m{width:var(--card);height:var(--card);object-fit:cover;margin-bottom:24px}
+.scard .eyebrow{margin-bottom:8px;font-size:14px;letter-spacing:3px}
+.scard h3{font:500 24px/28px var(--disp);text-transform:uppercase;color:var(--ink);margin-bottom:12px}
+.scard p{min-height:96px;margin-bottom:8px}
+
+/* Camere — immagine con testo centrato */
+.stay{padding:var(--sec-s) var(--m);background:#fff}
+.stay__hero{position:relative;height:min(804px,88vh);min-height:520px;overflow:hidden;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;background:#111}
+.stay__hero>.m{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.stay__shade{position:absolute;inset:0;background:radial-gradient(ellipse 55% 45% at 50% 50%,var(--scrim)),linear-gradient(180deg,rgba(0,0,0,.28),rgba(0,0,0,.42))}
+.stay__c{position:relative;width:min(812px,100% - 48px)}
+.stay__c .eyebrow{margin-bottom:16px}
+.stay__c h2{font:500 40px/48px var(--disp);text-transform:uppercase;letter-spacing:.02em;margin-bottom:16px}
+.stay__c p{font-weight:400;max-width:640px;margin:0 auto 32px}
+.stay__btn{display:flex;align-items:center;justify-content:center;gap:32px}
+.stay__btn .btn-o{padding:12px 32px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--g);padding:0 var(--mc) var(--sec);background:#fff}
+.grid4 article{display:flex;flex-direction:column}
+.grid4 .m{width:100%;aspect-ratio:1;object-fit:cover;margin-bottom:24px}
+/* h3 fluido solo tra 1101 e ~1230px (colonna ~205px; "Standardzimmer" in DE = 225px a 24px); sotto i 1100px torna 24px */
+.grid4 h3{font:500 clamp(20px,1.95vw,24px)/28px var(--disp);text-transform:uppercase;color:var(--ink);margin-bottom:12px}
+.grid4 p{margin-bottom:20px}
+.act{display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-top:auto} /* le azioni delle 4 card stanno sulla stessa linea */
+.act .btn-o{padding:12px 32px}
+
+/* Footer chiaro */
+.ft{background:#fff;padding:0 var(--mc);color:var(--text)}
+.crumb{display:flex;align-items:center;gap:14px;padding:16px 0;border-top:1px solid #ececec;color:var(--ink)}
+.crumb i{width:1px;height:12px;background:#c9c9c9}
+.crumb span{color:var(--text)}
+/* Logo sopra, poi le 4 colonne di link sulla stessa griglia a 4 colonne di proof/camere (stesse x delle colonne 1-4) */
+.ft__main{display:grid;grid-template-columns:minmax(0,1fr);gap:calc(var(--u)*4);padding:56px 0 48px}
+.ft__logo img{width:180px;height:auto}
+.ft__cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:calc(var(--u)*4) var(--g)}
+.ft h3{font:500 14px/20px var(--sans);letter-spacing:.5px;color:var(--ink);margin-bottom:16px}
+.ft__cols a,.ft__cols span,.ft__cols .lnk-b{display:block;margin-bottom:12px;color:var(--text);border:0;padding:0;text-align:left;font:400 14px/24px var(--sans);overflow-wrap:anywhere}
+.ft__cols a:hover,.ft__cols .lnk-b:hover{color:var(--acc-t)}
+.ft__bar{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;padding:24px 0 32px;border-top:1px solid #ececec;font-size:12px;color:#757575}
+.soc{display:flex;gap:24px;font-size:14px;color:var(--ink)}
+.soc a:hover{color:var(--acc-t)}
+
+/* Pannello richiesta di soggiorno */
+.req{position:fixed;inset:0 0 0 auto;margin:0;width:min(480px,100%);max-width:100%;height:100dvh;max-height:none;border:0;padding:0;background:#fff;color:var(--ink);transform:translateX(100%);transition:transform .45s cubic-bezier(.2,.7,.2,1);overflow-y:auto}
+.req.in{transform:none}
+.req::backdrop{background:rgba(0,0,0,.55)}
+.req__x{position:absolute;top:20px;right:20px;justify-self:auto}
+.req form{padding:72px 40px 40px}
+.req h2{font:500 28px/34px var(--disp);text-transform:uppercase;letter-spacing:.02em;margin-bottom:12px}
+.req__lead{margin-bottom:32px;color:var(--text)}
+.req label{display:block;margin-bottom:20px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#757575}
+.req input,.req select,.req textarea{display:block;width:100%;margin-top:6px;padding:10px 0;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;color:var(--ink);font:400 15px/22px var(--sans);letter-spacing:.3px;text-transform:none;transition:border-color .3s}
+.req textarea{resize:vertical}
+/* Linea dei campi #c9c9c9 → --line #949494 (1,66 → 3,03:1). Focus: la linea passa a 2px nel colore dell'anello (padding ridotto di 1px: nessuno spostamento) + anello globale
+   :focus-visible (2px). Prima: outline:0 e solo cambio di colore della linea. */
+.req input:focus,.req select:focus,.req textarea:focus{border-bottom-color:var(--ring);border-bottom-width:2px;padding-bottom:9px}
+/* Errore: non solo colore. Linea 2px (contro 1px) + testo .fe con icona "!" sotto il campo + aria-invalid (main.js). Il rosso resta #b3402c (5,70:1 su bianco). */
+.req input.bad:not([type=checkbox]),.req input[aria-invalid="true"]:not([type=checkbox]){border-bottom-color:var(--err);border-bottom-width:2px;padding-bottom:9px}
+.fe{display:none;margin-top:6px;font-size:12px;line-height:16px;letter-spacing:.3px;text-transform:none;color:var(--err)}
+.req input.bad ~ .fe,.req input[aria-invalid="true"] ~ .fe{display:flex}
+.fe::before,.req__err::before{content:"!";content:"!" / "";flex:none;display:inline-grid;place-items:center;width:14px;height:14px;margin-right:6px;border:1px solid currentColor;border-radius:50%;font:700 10px/1 var(--sans);letter-spacing:0;vertical-align:-2px}
+.fe::before{margin-top:1px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:0 20px}
+.row--3{grid-template-columns:.8fr .8fr 1.4fr}
+.check{display:flex!important;flex-wrap:wrap;gap:10px;align-items:flex-start;text-transform:none!important;letter-spacing:.3px!important;font-size:13px!important;line-height:20px}
+.check input{width:auto;margin:3px 0 0;accent-color:var(--ink)}
+.check input.bad:not(:focus-visible){outline:2px solid var(--err);outline-offset:2px} /* casella in errore: contorno rosso 2px (+ testo .fe); a fuoco vale l'anello di focus */
+.check .fe{flex:0 0 calc(100% - 23px);margin:0 0 0 23px} /* allineato al testo: casella 13px + gap 10px */
+.check a{color:var(--acc-t);border-bottom:1px solid currentColor} /* 3,22 → 4,73:1 (13px) */
+.req__micro{margin-top:16px;font-size:12px;color:#757575;text-align:center}
+.req__micro + .req__micro{margin-top:8px}
+.req__micro a,.req__oka a{color:var(--acc-t);border-bottom:1px solid currentColor;transition:color .3s} /* stessi colori e sottolineatura dei link del modulo (.check a): 4,73:1 su bianco */
+.req__micro a:hover,.req__oka a:hover{color:var(--ink)}
+.req__err{margin-top:12px;color:var(--err);font-size:13px;text-align:center}
+/* Stato "richiesta preparata" (nessun server: il modulo apre il programma di posta). Stessa posizione e stessa scala del messaggio d'errore (13px, centrato), in inchiostro invece che in rosso */
+.req__ok.on{margin-top:12px}
+.req__okt{font-size:13px;line-height:20px;color:var(--ink);text-align:center}
+.req__okt b{display:block;font-weight:500}
+.req__oka{margin-top:8px;font-size:12px;line-height:16px;color:#757575;text-align:center}
+.req__oka a{display:inline-block}
+
+/* Reveal */
+.js .rv{opacity:0;transform:translateY(24px);transition:opacity .9s ease,transform .9s ease}
+.js .rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .js .rv{opacity:1;transform:none;transition:none}
+  .hero__bg,.hero__cue::after{animation:none}
+  .story__bg,.story__t,.req{transition:none}
+}
+
+/* (Breakpoint Tablet ≤1100px e Mobile ≤700px: in fondo al file, un unico blocco per ciascuno) */
+
+/* ===== Conversione: CTA piena, prove, FAQ, chiusura, barra mobile ===== */
+.btn-f{display:inline-flex;align-items:center;justify-content:center;padding:18px 44px;border:1px solid var(--acc);background:var(--acc);color:#1b1712;font:500 14px/14px var(--sans);letter-spacing:.5px;cursor:pointer;transition:background .3s,color .3s,border-color .3s}
+.btn-f:hover{background:#fff6f0;border-color:#fff6f0;color:#1b1712}
+
+.proof{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--g);padding:var(--sec-s) var(--mc);background:#fff;border-bottom:1px solid #ececec}
+.proof div{display:flex;flex-direction:column;gap:8px}
+.proof b{font:500 var(--fs-proof)/1.25 var(--disp);text-transform:uppercase;letter-spacing:.02em;color:var(--ink)} /* prima 40/48 = h2: i numeri restano forti ma non gareggiano coi titoli di sezione */
+.proof span{max-width:26ch;color:var(--text);overflow-wrap:break-word}
+
+/* FAQ: titolo nella colonna 1, domande nelle colonne 2-4 (bordo destro sulla stessa linea di proof/camere) */
+.faq{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--g);padding:var(--sec) var(--mc);background:#fff;border-top:1px solid #ececec}
+.faq__l{grid-column:1}
+.faq__l h2{font:500 clamp(32px,3vw,40px)/48px var(--disp);text-transform:uppercase;letter-spacing:.02em;color:#000;margin-top:16px}
+.faq__r{grid-column:2 / -1}
+.faq details{border-bottom:1px solid #e3e3e3}
+.faq details:first-child{border-top:1px solid #e3e3e3}
+.faq summary{position:relative;list-style:none;cursor:pointer;padding:24px 48px 24px 0;font:500 20px/26px var(--disp);letter-spacing:.02em;color:var(--ink)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary:focus-visible{outline-offset:-2px} /* anello dentro la riga: non invade la risposta aperta né i filetti vicini */
+.faq summary::after{content:"";position:absolute;right:6px;top:50%;width:10px;height:10px;border-right:1px solid var(--ink);border-bottom:1px solid var(--ink);transform:translateY(-70%) rotate(45deg);transition:transform .3s}
+.faq details[open] summary::after{transform:translateY(-30%) rotate(-135deg)}
+.faq details p{padding:0 48px 26px 0;max-width:720px}
+
+.fin{position:relative;min-height:640px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;background:#0b141c;color:#fff;padding:calc(var(--u)*12) var(--m)}
+.fin__bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 60%}
+.fin__shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,.72))}
+.fin__c{position:relative;width:min(812px,100%)}
+.fin__c .eyebrow{margin-bottom:16px}
+.fin__c h2{font:500 40px/48px var(--disp);text-transform:uppercase;letter-spacing:.02em;margin-bottom:16px}
+.fin__c>p{font-weight:400;max-width:640px;margin:0 auto 24px}
+.fin__l{list-style:none;margin:0 0 36px;padding:0;display:flex;justify-content:center;gap:12px 32px;flex-wrap:wrap}
+.fin__l li{position:relative;padding-left:20px;font-weight:400}
+.fin__l li::before{content:"";position:absolute;left:0;top:8px;width:9px;height:5px;border-left:1px solid var(--acc);border-bottom:1px solid var(--acc);transform:rotate(-45deg)}
+.fin__cta{margin-bottom:28px}
+.fin>.fin__c>.fin__d{font-size:13px;font-weight:400;color:rgba(255,255,255,.8);margin:0}
+.fin__d a{color:var(--acc);border-bottom:1px solid currentColor}
+.fin__d a:hover{color:#fff}
+
+.sticky{position:fixed;inset:auto 0 0 0;z-index:55;display:none;gap:12px;padding:12px var(--m) calc(12px + env(safe-area-inset-bottom));background:rgba(10,18,25,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,.14);transform:translateY(110%);transition:transform .4s}
+.sticky.is-on{transform:none}
+.sticky .btn-o{flex:0 0 auto;padding:16px 24px}
+.sticky .btn-f{flex:1;padding:16px 20px}
+
+/* ===== BREAKPOINT (gli unici due: 1100 e 700) =====
+   Tablet ≤1100px: margine 40px · proof / camere / colonne footer passano da 4 a 2 colonne ·
+   carosello e FAQ si impilano (testo sopra, track a filo sotto) · padding di sezione 56px */
+@media (max-width:1100px){
+  :root{--m:40px;--sec:calc(var(--u)*7);--sec-s:calc(var(--u)*6)}
+  .spot{grid-template-columns:minmax(0,1fr);row-gap:calc(var(--u)*5)}
+  .spot__l,.spot__track{grid-column:auto}
+  .spot__l{max-width:520px}
+  .story__t h2,.spot__l h2,.stay__c h2,.faq__l h2,.fin__c h2{font-size:var(--fs-h2);line-height:1.2} /* h2 fluido 28→40px: da 701px il titolo hero resta almeno 1,27× più grande */
+  .story__shade{background:radial-gradient(ellipse 90% 42% at 50% 50%,var(--scrim)),linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.25) 40%,rgba(0,0,0,.55))}
+  .stay__shade{background:radial-gradient(ellipse 90% 45% at 50% 50%,var(--scrim)),linear-gradient(180deg,rgba(0,0,0,.28),rgba(0,0,0,.42))}
+  .hero__shade{background:radial-gradient(ellipse 95% 55% at 50% 50%,var(--scrim)),linear-gradient(180deg,rgba(0,0,0,.45) 0%,rgba(0,0,0,.32) 35%,rgba(0,0,0,.4) 65%,rgba(0,0,0,.6) 100%)}
+  .proof,.grid4,.ft__cols{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid4{row-gap:var(--row)}
+  .scard h3,.grid4 h3{font-size:var(--fs-h3)}
+  .faq{grid-template-columns:minmax(0,1fr);gap:calc(var(--u)*3)}
+  .faq__l,.faq__r{grid-column:auto}
+}
+/* Mobile ≤700px: margine e gutter 24px · card 280px · camere a 1 colonna, proof e footer a 2 · padding di sezione 48px */
+@media (max-width:700px){
+  :root{--m:24px;--g:calc(var(--u)*3);--card:280px;--sec:calc(var(--u)*6);--hh:72px;--fs-h2:clamp(24px,7.5vw,28px);--fs-h3:calc(var(--fs-h2) / 1.27)}
+  .hd__logo img{height:48px}
+  .btn-o{padding:12px 20px}
+  .btn-f{padding:18px 24px} /* "Richiedi la tua proposta di soggiorno" (249px) sta su una riga: pulsante 52px invece di 66px, non schiaccia il titolo */
+  .hd__book{padding:10px 18px}
+  .hero h1{font-size:clamp(28px,8.6vw,32px);line-height:1.25} /* 32px = massimo che tiene il titolo IT su 4 righe a 375px (a 36px diventa 6 righe strette) */
+  .hero__shade{background:radial-gradient(ellipse 120% 68% at 50% 50%,var(--scrim)),linear-gradient(180deg,rgba(0,0,0,.45) 0%,rgba(0,0,0,.32) 35%,rgba(0,0,0,.4) 65%,rgba(0,0,0,.6) 100%)}
+  .story__shade{background:radial-gradient(ellipse 120% 48% at 50% 50%,var(--scrim)),linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.25) 40%,rgba(0,0,0,.55))}
+  .stay__shade{background:radial-gradient(ellipse 120% 52% at 50% 50%,var(--scrim)),linear-gradient(180deg,rgba(0,0,0,.28),rgba(0,0,0,.42))}
+  .eyebrow{font-size:14px;letter-spacing:3px}
+  .scard h3,.grid4 h3{line-height:1.2} /* corpo = --fs-h3 = h2 ÷ 1,27 (22px a 375px) */
+  .story__t h2,.spot__l h2,.stay__c h2{font-size:var(--fs-h2);line-height:1.15}
+  .story__dots{right:14px}
+  .stay{padding:calc(var(--u)*4) var(--m)}
+  .stay__hero{min-height:560px}
+  .stay__btn{flex-direction:column;gap:20px}
+  .grid4{grid-template-columns:minmax(0,1fr)}
+  .proof{gap:calc(var(--u)*4) var(--g)}
+  .faq__l h2,.fin__c h2{font-size:var(--fs-h2);line-height:1.15}
+  .faq summary{font-size:18px}
+  .hero__cta{gap:20px}
+  .hero__cta .btn-f{width:100%}
+  .sticky{display:flex}
+  html{scroll-padding-bottom:calc(var(--u)*10)} /* 80px: l'elemento a fuoco non resta coperto dalla barra CTA fissa (76px) */
+  .ft{padding-bottom:calc(var(--m) + 56px)} /* 56px = altezza barra CTA fissa */
+  .ft__bar{flex-direction:column;align-items:flex-start}
+  .fin{min-height:560px;padding-top:calc(var(--u)*9);padding-bottom:calc(var(--u)*9)}
+  .req form{padding:64px 24px 32px}
+  .row,.row--3{grid-template-columns:1fr}
+}
+
+/* Viewport molto bassi (≤600px di altezza, es. telefono in orizzontale): il menu a tutto schermo ha voci (~424px) e piede sovrapposti.
+   Sopra i 600px .menu__body è display:contents (nessun box: layout identico a prima); sotto diventa una colonna scorrevole sotto la X di chiusura,
+   con il piede di seguito alle voci invece che fisso in basso. */
+@media (max-height:600px){
+  .menu{justify-content:flex-start}
+  .menu__body{display:flex;flex-direction:column;align-items:center;flex:1;width:100%;min-height:0;margin-top:var(--hh);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.4) transparent}
+  .menu__nav{flex:none;margin-block:auto;padding-block:8px}
+  .menu__foot{position:static;flex:none;width:100%;margin:24px 0 32px}
+}
+
+/* ===== PREFERENZE DI SISTEMA (accessibilità visiva) — in fondo al file perché devono vincere sulle regole di base ===== */
+
+/* Movimento ridotto: completa il blocco di sopra con ciò che vive più in basso — dissolvenza/scorrimento del menu a tutto schermo,
+   barra CTA mobile, rotazione della freccia delle FAQ, indicatore del carosello, linee dell'hamburger, punti dei pannelli. (Slider, Ken Burns, pannelli, reveal e
+   scroll-behavior erano già coperti; il carosello usa behavior:auto in main.js.) */
+@media (prefers-reduced-motion:reduce){
+  .menu,.menu__nav a,.sticky,.faq summary::after,.hd__menu span,.bar i,.story__dots li{transition:none}
+}
+
+/* Contrasto forzato (Windows "Temi a contrasto"): colori, ombre e sfondi vengono sostituiti dal sistema. Bordi e outline restano (il focus è un outline);
+   gli elementi disegnati SOLO con background (linee dell'hamburger, traccia/indicatore del carosello, punti dei pannelli, separatori, lingua attiva)
+   riprendono colori di sistema, e i testi sulle foto ottengono uno sfondo di sistema (altrimenti il colore forzato del testo può coincidere con la foto). */
+@media (forced-colors:active){
+  .hd__menu span,.menu__x span,.req__x span{background:ButtonText}
+  .bar,.story__dots li,.crumb i{background:GrayText}
+  .bar i,.story__dots li.is-on{background:Highlight}
+  .lang a[aria-current]{background:Highlight;color:HighlightText;forced-color-adjust:none}
+  .btn-f{border-width:2px}
+  .hero__c,.story__t,.stay__c,.fin__c{background:Canvas;padding:24px}
+}
+
+/* Contrasto alto richiesto dall'utente (facoltativo, 7 righe): linee, testo secondario e anello di focus più marcati; l'aspetto predefinito non cambia */
+@media (prefers-contrast:more){
+  :root{--line:#6b6b6b;--acc-t:#7a5f40;--acc-d:#7a5f40;--text:var(--ink)}
+  .req label,.req__micro,.req__oka,.ft__bar{color:var(--ink)}
+  .arr{border-color:var(--line)}
+  .hd.is-dark,.menu,.hero,.story__stick,.stay__hero,.fin,.sticky{--ring:#fff}
+  .hd.is-dark{background:rgba(11,20,28,.85)}
+  .hero__micro,.fin>.fin__c>.fin__d,.menu__foot{color:#fff}
+}

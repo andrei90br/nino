@@ -1,0 +1,11 @@
+# Output generato da build.ps1
+site/
+
+# Configurazione locale dell'ambiente di lavoro
+.claude/
+
+# Sistema operativo / editor
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.log
